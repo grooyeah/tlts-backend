@@ -4,17 +4,11 @@ namespace OnboardingAPI.Repositories.Users
 {
     public interface IUserRepository
     {
-        //Crud 
-
-        //Create
-        // Return something else (ok or something)
-
-        public Task<User> CreateUser(User user);
-        //Read
-        public Task<User> GetUser(int id);
-        //Update
-        public Task<User> UpdateUser(User user);
-        //Delete
-        public Task<int> DeleteUser(int id);
+        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByNameAsync(string name);
+        Task<List<User>> GetAllUsersAsync();
+        Task<bool> AddUserAsync(User user);
+        Task<bool> UpdateUserAsync(User user);
+        Task<bool> DeleteUserAsync(int id);
     }
 }

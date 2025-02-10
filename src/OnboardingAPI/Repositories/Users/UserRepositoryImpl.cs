@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnboardingAPI.Database;
 using OnboardingAPI.Models;
-using System.Data.Common;
 
 namespace OnboardingAPI.Repositories.Users
 {
@@ -16,74 +15,43 @@ namespace OnboardingAPI.Repositories.Users
             _logger = logger;
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<User> GetUserByIdAsync(int id)
         {
-            var existingUser = _context.Users.AnyAsync(x => x.Name ==  user.Name).Result;
-
-            if(existingUser)
-            {
-                _logger.LogWarning("User already exists");
-                return null;
-            }
-
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-
-            return user;
+            return await _context.Users.FindAsync(id);
         }
 
-        public Task<User> GetUser(int id)
+        public async Task<User> GetUserByNameAsync(string name)
         {
-            var existingUser = _context.Users.AnyAsync(x => x.Id == id).Result;
-
-            if(!existingUser)
-            {
-                _logger.LogWarning("User doesn't exist");
-                return null;
-            }
-
-            var userInDb = _context.Users.SingleOrDefaultAsync(x => x.Id == id);
-
-            return userInDb;
+            return await _context.Users.FirstOrDefaultAsync(x => x.Name == name);
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<List<User>> GetAllUsersAsync()
         {
-            var existingUser = _context.Users.AnyAsync(x => x.Id == user.Id).Result;
-
-            if(!existingUser)
-            {
-                _logger.LogWarning("User could not be found");
-                return null;
-            }
-
-            var userInDb = await _context.Users.SingleOrDefaultAsync(x => x.Id == user.Id);
-            
-            userInDb.Name = user.Name;
-            userInDb.Email = user.Email;
-            userInDb.PasswordHash = user.PasswordHash;
-            userInDb.Role = user.Role;
-
-            await _context.SaveChangesAsync();
-
-            return userInDb;
+            return await _context.Users.ToListAsync();
         }
-        public async Task<int> DeleteUser(int id)
+
+        public async Task<bool> AddUserAsync(User user)
         {
-            var existingUser = _context.Users.AnyAsync(x => x.Id == id).Result;
+            _context.Users.Add(user);
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
+        }
 
-            if(! existingUser)
-            {
-                _logger.LogWarning("User could not be found");
-                return id;
-            }
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
+        }
 
-            var userInDb = await _context.Users.SingleOrDefaultAsync(x => x.Id == id);
+        public async Task<bool> DeleteUserAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
 
-            _context.Remove<User>(userInDb);
-            await _context.SaveChangesAsync();
-
-            return id;
+            _context.Users.Remove(user);
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
         }
     }
 }

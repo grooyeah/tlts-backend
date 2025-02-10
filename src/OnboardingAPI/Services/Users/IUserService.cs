@@ -4,16 +4,11 @@ namespace OnboardingAPI.Services.Users
 {
     public interface IUserService
     {
-        //Crud 
-
-        //Create
-        // Return something else (ok or something)
-        public Task<User> CreateUser(User user);
-        //Read
-        public Task<User> GetUser(int  id);
-        //Update
-        public Task<User> UpdateUser(User user);
-        //Delete
-        public Task<int> DeleteUser(int id);
+        Task<ServiceResult<User>> CreateUserAsync(User user);
+        Task<ServiceResult<User>> GetUserByIdAsync(int id);
+        Task<ServiceResult<User>> UpdateUserAsync(int id, User user);
+        Task<ServiceResult<bool>> DeleteUserAsync(int id);
+        Task<ServiceResult<User>> GetUserByNameAsync(string name);
+        Task<ServiceResult<List<User>>> GetAllUsersAsync();
     }
 }

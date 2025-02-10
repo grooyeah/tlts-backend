@@ -1,7 +1,10 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using OnboardingAPI.Database;
+using OnboardingAPI.Models;
 using OnboardingAPI.Repositories.Users;
 using OnboardingAPI.Services.Users;
+using OnboardingAPI.Validators.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IUserRepository, UserRepositoryImpl>();
+
+builder.Services.AddScoped<IValidator<User>, UserValidator>();
 
 builder.Services.AddLogging();
 // Database Connection
