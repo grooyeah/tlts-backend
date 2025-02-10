@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnboardingAPI.Database;
 using OnboardingAPI.Models;
+using OnboardingAPI.Services.Users;
 
 namespace OnboardingAPI.Controllers
 {
@@ -9,28 +10,41 @@ namespace OnboardingAPI.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly IUserService _userService;
 
-        public UserController(DatabaseContext context)
+        public UserController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         // Get all users
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers(int id)
         {
-            var users = await _context.Users.ToListAsync();
-            return Ok(users);
+            var user = await _userService.GetUser(id);
+            return Ok(user);
         }
 
         // Create a new user
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUsers), new { id = user.Id }, user);
+            var userCreated = await _userService.CreateUser(user);
+            return CreatedAtAction(nameof(GetUsers), new { id = user.Id }, userCreated);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] User user)
+        {
+            var userUpdated = await _userService.UpdateUser(user);
+            return Ok(userUpdated);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var result = await _userService.DeleteUser(id);
+            return Ok(result);
         }
     }
 }
